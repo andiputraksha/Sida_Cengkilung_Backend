@@ -8,6 +8,7 @@ const getAllKonten = async (req, res) => {
     const data = await kontenService.getAllKonten(filter);
     return successResponse(res, 'Data konten berhasil diambil', data);
   } catch (error) {
+    console.error('[GET /api/konten] Error:', error.message);
     return errorResponse(res, error.message);
   }
 };
@@ -18,6 +19,7 @@ const getKontenById = async (req, res) => {
     const data = await kontenService.getKontenById(id);
     return successResponse(res, 'Detail konten berhasil diambil', data);
   } catch (error) {
+    console.error('[GET /api/konten/:id] Error:', error.message);
     return errorResponse(res, error.message);
   }
 };
@@ -27,6 +29,7 @@ const getKategoriKonten = async (req, res) => {
     const data = await kontenService.getKategoriKonten();
     return successResponse(res, 'Data kategori konten berhasil diambil', data);
   } catch (error) {
+    console.error('[GET /api/konten/kategori] Error:', error.message);
     return errorResponse(res, error.message);
   }
 };

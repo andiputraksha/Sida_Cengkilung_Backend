@@ -1,30 +1,40 @@
-const corsOptions = {
-  origin: function (origin, callback) {
-    const allowedOrigins = [
-      'http://localhost:3000',
-      'http://localhost:3001',
-      'http://127.0.0.1:3000',
-      'http://127.0.0.1:3001',
-      /\.ngrok-free\.app$/ // ✅ izinkan semua domain ngrok
-    ];
+const normalizeOrigin = (value = '') => String(value).trim().replace(/\/$/, '');
 
+const envAllowedOrigins = String(process.env.FRONTEND_URLS || '')
+  .split(',')
+  .map((item) => normalizeOrigin(item))
+  .filter(Boolean);
+
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:3001',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:3001',
+  'https://sida-cengkilung-frontend.vercel.app',
+  ...envAllowedOrigins
+].map(normalizeOrigin);
+
+const allowedRegexOrigins = [
+  /\.ngrok-free\.app$/,
+  /\.vercel\.app$/
+];
+
+const corsOptions = {
+  origin(origin, callback) {
     if (!origin) return callback(null, true);
 
-    const isAllowed = allowedOrigins.some(o => {
-      if (o instanceof RegExp) return o.test(origin);
-      return o === origin;
-    });
+    const normalizedOrigin = normalizeOrigin(origin);
+    const isAllowed =
+      allowedOrigins.includes(normalizedOrigin) ||
+      allowedRegexOrigins.some((pattern) => pattern.test(normalizedOrigin));
 
-    if (isAllowed) {
-      callback(null, true);
-    } else {
-      console.log("❌ Blocked by CORS:", origin);
-      callback(new Error('Not allowed by CORS'));
-    }
+    if (isAllowed) return callback(null, true);
+
+    console.log('Blocked by CORS:', origin);
+    return callback(new Error('Not allowed by CORS'));
   },
-
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'], // ✅ tambah OPTIONS
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'x-device-info']
 };
 
