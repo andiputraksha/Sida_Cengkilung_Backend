@@ -8,6 +8,10 @@ node_modules/
 
 # Upload directories
 uploads/
+!uploads/
+!uploads/profil/
+!uploads/profil/logo.png
+!uploads/profil/banjar-cengkilung.jpg
 backups/
 logs/
 
