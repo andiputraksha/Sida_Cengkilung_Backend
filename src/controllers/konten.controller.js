@@ -1,5 +1,6 @@
 const kontenService = require('../services/konten.service');
 const { successResponse, errorResponse } = require('../utils/response');
+const { saveUploadedFile } = require('../middlewares/upload.middleware');
 
 // PUBLIC CONTROLLERS
 const getAllKonten = async (req, res) => {
@@ -46,9 +47,17 @@ const getAllKontenAdmin = async (req, res) => {
 
 const createKonten = async (req, res) => {
   try {
+    let thumbnailPath = null;
+    if (req.file) {
+      thumbnailPath = await saveUploadedFile(req.file, 'konten');
+      if (!thumbnailPath) {
+        return errorResponse(res, 'Gagal menyimpan file thumbnail');
+      }
+    }
+
     const kontenData = {
       ...req.body,
-      thumbnail: req.file ? req.file.path.replace(/\\/g, '/') : null
+      thumbnail: thumbnailPath
     };
     const result = await kontenService.createKonten(kontenData, req.user.id);
 
@@ -61,6 +70,7 @@ const createKonten = async (req, res) => {
 
     return successResponse(res, 'Konten berhasil dibuat', result, 201);
   } catch (error) {
+    console.error('[POST /api/konten] Error:', error.message);
     return errorResponse(res, error.message);
   }
 };
@@ -68,9 +78,18 @@ const createKonten = async (req, res) => {
 const updateKonten = async (req, res) => {
   try {
     const { id } = req.params;
+    let thumbnailPath;
+
+    if (req.file) {
+      thumbnailPath = await saveUploadedFile(req.file, 'konten');
+      if (!thumbnailPath) {
+        return errorResponse(res, 'Gagal menyimpan file thumbnail');
+      }
+    }
+
     const kontenData = {
       ...req.body,
-      ...(req.file ? { thumbnail: req.file.path.replace(/\\/g, '/') } : {})
+      ...(req.file ? { thumbnail: thumbnailPath } : {})
     };
     
     // Tambahkan tanggal_diperbarui otomatis
@@ -87,6 +106,7 @@ const updateKonten = async (req, res) => {
 
     return successResponse(res, result.message);
   } catch (error) {
+    console.error('[PUT /api/konten/:id] Error:', error.message);
     return errorResponse(res, error.message);
   }
 };
