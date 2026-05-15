@@ -8,7 +8,6 @@ const { upload } = require('../middlewares/upload.middleware');
 // Public routes - bisa diakses guest
 router.get('/', galeriController.getAllGaleri);
 router.get('/kategori', galeriController.getKategoriGaleri);
-router.get('/:id', galeriController.getGaleriById);
 
 // Admin routes
 router.get('/admin/semua', authMiddleware, roleMiddleware('admin'), galeriController.getAllGaleriAdmin);
@@ -33,5 +32,6 @@ router.put(
   galeriController.updateGaleri
 );
 router.delete('/:id', authMiddleware, roleMiddleware('admin'), galeriController.deleteGaleri);
+router.get('/:id', galeriController.getGaleriById);
 
 module.exports = router;

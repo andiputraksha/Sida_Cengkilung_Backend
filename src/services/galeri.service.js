@@ -101,7 +101,8 @@ const updateGaleri = async (id, galeriData) => {
     tipe_media,
     file_path,
     thumbnail,
-    id_kategori_galeri
+    id_kategori_galeri,
+    tanggal_publikasi
   } = galeriData;
 
   const updateFields = [];
@@ -112,6 +113,7 @@ const updateGaleri = async (id, galeriData) => {
   if (!isNil(file_path)) { updateFields.push('file_path = ?'); values.push(file_path); }
   if (!isNil(thumbnail)) { updateFields.push('thumbnail = ?'); values.push(toNullIfEmpty(thumbnail)); }
   if (!isNil(id_kategori_galeri)) { updateFields.push('id_kategori_galeri = ?'); values.push(Number(id_kategori_galeri)); }
+  if (!isNil(tanggal_publikasi)) { updateFields.push('tanggal_publikasi = ?'); values.push(toNullIfEmpty(tanggal_publikasi)); }
 
   if (updateFields.length === 0) {
     throw new Error('Tidak ada data yang diperbarui');

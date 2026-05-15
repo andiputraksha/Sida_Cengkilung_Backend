@@ -1,5 +1,6 @@
 const galeriService = require('../services/galeri.service');
 const { successResponse, errorResponse } = require('../utils/response');
+const { saveUploadedFile } = require('../middlewares/upload.middleware');
 
 const resolveMediaPath = (body = {}, file = null) => {
   const sumberMedia = body.sumber_media;
@@ -23,11 +24,10 @@ const resolveMediaPath = (body = {}, file = null) => {
 const getUploadedFilePath = (req, fieldName) => {
   // Untuk route lama (single) fallback ke req.file
   if (fieldName === 'file' && req.file) {
-    return req.file.path.replace(/\\/g, '/');
+    return req.file;
   }
 
-  const file = req.files?.[fieldName]?.[0];
-  return file ? file.path.replace(/\\/g, '/') : null;
+  return req.files?.[fieldName]?.[0] || null;
 };
 
 // PUBLIC CONTROLLERS
@@ -72,8 +72,10 @@ const getAllGaleriAdmin = async (req, res) => {
 
 const createGaleri = async (req, res) => {
   try {
-    const mediaFilePath = getUploadedFilePath(req, 'file');
-    const thumbnailFilePath = getUploadedFilePath(req, 'thumbnail');
+    const mediaFile = getUploadedFilePath(req, 'file');
+    const thumbnailFile = getUploadedFilePath(req, 'thumbnail');
+    const mediaFilePath = mediaFile ? await saveUploadedFile(mediaFile, 'galeri') : null;
+    const thumbnailFilePath = thumbnailFile ? await saveUploadedFile(thumbnailFile, 'galeri') : null;
 
     const galeriData = {
       ...req.body,
@@ -98,8 +100,10 @@ const createGaleri = async (req, res) => {
 const updateGaleri = async (req, res) => {
   try {
     const { id } = req.params;
-    const mediaFilePath = getUploadedFilePath(req, 'file');
-    const thumbnailFilePath = getUploadedFilePath(req, 'thumbnail');
+    const mediaFile = getUploadedFilePath(req, 'file');
+    const thumbnailFile = getUploadedFilePath(req, 'thumbnail');
+    const mediaFilePath = mediaFile ? await saveUploadedFile(mediaFile, 'galeri') : null;
+    const thumbnailFilePath = thumbnailFile ? await saveUploadedFile(thumbnailFile, 'galeri') : null;
     const mediaPath = resolveMediaPath(req.body, mediaFilePath ? { path: mediaFilePath } : null);
 
     const galeriData = {
