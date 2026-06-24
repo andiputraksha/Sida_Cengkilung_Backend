@@ -2,6 +2,18 @@ const kontenService = require('../services/konten.service');
 const { successResponse, errorResponse } = require('../utils/response');
 const { saveUploadedFile } = require('../middlewares/upload.middleware');
 
+const logAktivitas = async (idPengguna, aktivitas, detail) => {
+  try {
+    const pool = require('../config/db').pool;
+    await pool.execute(
+      'INSERT INTO tb_log_aktivitas (id_pengguna, aktivitas, detail) VALUES (?, ?, ?)',
+      [idPengguna, aktivitas, detail]
+    );
+  } catch (logError) {
+    console.warn('Log aktivitas gagal:', logError.message);
+  }
+};
+
 // PUBLIC CONTROLLERS
 const getAllKonten = async (req, res) => {
   try {
@@ -61,12 +73,7 @@ const createKonten = async (req, res) => {
     };
     const result = await kontenService.createKonten(kontenData, req.user.id);
 
-    // Log aktivitas
-    const pool = require('../config/db').pool;
-    await pool.execute(
-      'INSERT INTO tb_log_aktivitas (id_pengguna, aktivitas, detail) VALUES (?, ?, ?)',
-      [req.user.id, 'CREATE_KONTEN', `Membuat konten: ${kontenData.judul}`]
-    );
+    await logAktivitas(req.user.id, 'CREATE_KONTEN', `Membuat konten: ${kontenData.judul}`);
 
     return successResponse(res, 'Konten berhasil dibuat', result, 201);
   } catch (error) {
@@ -97,12 +104,7 @@ const updateKonten = async (req, res) => {
     
     const result = await kontenService.updateKonten(id, kontenData, req.user.id);
 
-    // Log aktivitas
-    const pool = require('../config/db').pool;
-    await pool.execute(
-      'INSERT INTO tb_log_aktivitas (id_pengguna, aktivitas, detail) VALUES (?, ?, ?)',
-      [req.user.id, 'UPDATE_KONTEN', `Memperbarui konten ID: ${id}`]
-    );
+    await logAktivitas(req.user.id, 'UPDATE_KONTEN', `Memperbarui konten ID: ${id}`);
 
     return successResponse(res, result.message);
   } catch (error) {
@@ -116,12 +118,7 @@ const deleteKonten = async (req, res) => {
     const { id } = req.params;
     const result = await kontenService.deleteKonten(id);
 
-    // Log aktivitas
-    const pool = require('../config/db').pool;
-    await pool.execute(
-      'INSERT INTO tb_log_aktivitas (id_pengguna, aktivitas, detail) VALUES (?, ?, ?)',
-      [req.user.id, 'DELETE_KONTEN', `Menghapus konten ID: ${id}`]
-    );
+    await logAktivitas(req.user.id, 'DELETE_KONTEN', `Menghapus konten ID: ${id}`);
 
     return successResponse(res, result.message);
   } catch (error) {

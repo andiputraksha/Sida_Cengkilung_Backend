@@ -59,7 +59,7 @@ const getAllKontenAdmin = async () => {
     FROM tb_konten k
     LEFT JOIN tb_kategori_konten kk ON k.id_kategori_konten = kk.id_kategori_konten
     LEFT JOIN tb_pengguna p ON k.id_pengguna = p.id_pengguna
-    ORDER BY k.tanggal_diperbarui DESC, k.tanggal_dibuat DESC
+    ORDER BY k.id_konten ASC
   `);
   return rows;
 };

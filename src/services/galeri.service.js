@@ -58,7 +58,7 @@ const getAllGaleriAdmin = async () => {
     SELECT g.*, kg.nama_kategori 
     FROM tb_galeri g
     LEFT JOIN tb_kategori_galeri kg ON g.id_kategori_galeri = kg.id_kategori_galeri
-    ORDER BY g.tanggal_publikasi DESC
+    ORDER BY g.id_galeri ASC
   `);
   return rows;
 };
