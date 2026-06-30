@@ -22,7 +22,6 @@ const resolveMediaPath = (body = {}, file = null) => {
 };
 
 const getUploadedFilePath = (req, fieldName) => {
-  // Untuk route lama (single) fallback ke req.file
   if (fieldName === 'file' && req.file) {
     return req.file;
   }
@@ -111,6 +110,13 @@ const updateGaleri = async (req, res) => {
       ...(mediaPath ? { file_path: mediaPath } : {}),
       ...(thumbnailFilePath ? { thumbnail: thumbnailFilePath } : {})
     };
+
+    // ✅ PERBAIKAN: Hapus tanggal_publikasi dari galeriData jika tidak dikirim (undefined)
+    // Ini memastikan tanggal_publikasi tidak di-overwrite dengan undefined
+    if (galeriData.tanggal_publikasi === undefined) {
+      delete galeriData.tanggal_publikasi;
+    }
+
     const result = await galeriService.updateGaleri(id, galeriData);
 
     // Log aktivitas
